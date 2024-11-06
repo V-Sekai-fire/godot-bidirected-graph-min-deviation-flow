@@ -21,10 +21,6 @@ third_party_sources += [
 ]
 
 module_env = env.Clone()
-if module_env.msvc:
-    module_env.Append(CXXFLAGS=['/std:c++2a'])
-else:
-    module_env.Append(CXXFLAGS=['-std=c++2a'])
 
 module_env.Prepend(CPPPATH=[
     'thirdparty/libsatsuma/src',
