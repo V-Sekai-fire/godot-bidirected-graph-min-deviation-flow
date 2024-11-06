@@ -1,12 +1,34 @@
 Import('env')
 
-sources = [
-    "register_types.cpp",
-]
+sources = []
 
-sources += env.Glob('*.cpp')
+sources += env.Glob('*.cpp') 
+sources += env.Glob('thirdparty/libsatsuma/src/libsatsuma/Problems/*.cc')
+sources += env.Glob('thirdparty/libsatsuma/src/libsatsuma/Extra/*.cc')
+sources += env.Glob('thirdparty/libsatsuma/src/libsatsuma/IO/*.cc')
+sources += env.Glob('thirdparty/libsatsuma/src/libsatsuma/Reductions/*.cc')
+sources += [
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/BiMDFDoubleCover.cc',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/BiMDFGuess.cc',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/BiMDFRefinement.cc',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/EvenBiMDF.cc',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/Matching.cc',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/MCF.cc',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/TJoinMST.cc',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers/OrientBinet.cc',
+]
 module_env = env.Clone()
 
+if module_env.msvc:
+    # For MSVC, use /std:c++20
+    module_env.Append(CXXFLAGS=['/std:c++20'])
+else:
+    # For GCC and Clang, use -std=c++20
+    module_env.Append(CXXFLAGS=['-std=c++20'])
+    
+sources += [
+    "register_types.cpp",
+]
 if module_env["disable_exceptions"]:
     if env.msvc:
         module_env.Append(CPPDEFINES=[("_HAS_EXCEPTIONS", 0)])
@@ -14,10 +36,12 @@ if module_env["disable_exceptions"]:
         module_env.Append(CXXFLAGS=["-fno-exceptions"])
 elif env.msvc:
     module_env.Append(CXXFLAGS=["/EHsc"])
+
 module_env.Prepend(CPPPATH=[
     'thirdparty/libsatsuma/src',
     'thirdparty/libsatsuma/external/lemon',
     'thirdparty/libsatsuma/external/timekeeper/src',
+    'thirdparty/libsatsuma/src/libsatsuma/Solvers',
     '#modules/bimdf'
 ])
 

@@ -1,4 +1,5 @@
 #include "bimdf.h"
+#include "core/string/ustring.h"
 
 void BIMDF::solve() {
         using BiMDF = Satsuma::BiMDF;
@@ -29,15 +30,12 @@ void BIMDF::solve() {
                 .matching_solver = Satsuma::MatchingSolver::Lemon
         };
         auto result = Satsuma::solve_bimdf(bimdf, config);
-
-        if (!result.solution) {
-                std::cerr << "Solution not found or invalid." << std::endl;
-                return; // Early exit if solution is not available
-        }
-
-        std::cout << "Total cost: " << result.cost << std::endl;
+        std::ostringstream buffer;
+        buffer << "Total cost: " << result.cost << "\n";
         for (const auto& [name, edge] : edges) {
-                std::cout << "Flow on " << name << ": " << (*result.solution)[edge] << std::endl;
+                buffer << "Flow on " << name << ": " << (*result.solution)[edge] << "\n";
         }
-        std::cout << result.stopwatch << std::endl;
+        buffer << result.stopwatch << std::endl;
+        std::string output = buffer.str();
+        print_line(output.c_str());
 }
