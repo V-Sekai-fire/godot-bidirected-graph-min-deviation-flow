@@ -5,9 +5,15 @@ sources = [
 ]
 
 sources += env.Glob('*.cpp')
-
 module_env = env.Clone()
 
+if module_env["disable_exceptions"]:
+    if env.msvc:
+        module_env.Append(CPPDEFINES=[("_HAS_EXCEPTIONS", 0)])
+    else:
+        module_env.Append(CXXFLAGS=["-fno-exceptions"])
+elif env.msvc:
+    module_env.Append(CXXFLAGS=["/EHsc"])
 module_env.Prepend(CPPPATH=[
     'thirdparty/libsatsuma/src',
     'thirdparty/libsatsuma/external/lemon',
