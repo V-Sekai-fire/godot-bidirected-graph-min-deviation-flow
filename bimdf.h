@@ -28,11 +28,25 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef BIMDF_REGISTER_TYPES_H
-#define BIMDF_REGISTER_TYPES_H
-#include "modules/register_module_types.h"
+#ifndef BIMDF_H
+#define BIMDF_H
 
-void initialize_bimdf_module(ModuleInitializationLevel p_level);
-void uninitialize_bimdf_module(ModuleInitializationLevel p_level);
+#include "core/object/object.h"
+#include "core/object/ref_counted.h"
 
-#endif // BIMDF_REGISTER_TYPES_H
+#include <libsatsuma/Problems/BiMDF.hh>
+#include <libsatsuma/Extra/Highlevel.hh>
+#include <libTimekeeper/StopWatchPrinting.hh>
+#include <map>
+
+class BIMDF : public RefCounted {
+    GDCLASS(BIMDF, RefCounted);
+protected:
+    static void _bind_methods() {
+        ClassDB::bind_method(D_METHOD("solve"), &BIMDF::solve);
+    }
+public:
+	void solve();
+};
+
+#endif

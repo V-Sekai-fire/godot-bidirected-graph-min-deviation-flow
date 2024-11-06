@@ -1,12 +1,19 @@
-
 Import('env')
 
 sources = [
     "register_types.cpp",
 ]
 
-module_env = env.Clone()
-module_env.Append(CCFLAGS=['-O2'])
-module_env.Prepend(CPPPATH=['thirdparty/libsatsuma/src', 'thirdparty/external/lemon'])
+sources += env.Glob('*.cpp')
 
-module_env.add_source_files(env.modules_sources, sources)
+module_env = env.Clone()
+module_env["disable_exceptions"] = False
+
+module_env.Prepend(CPPPATH=[
+    'thirdparty/libsatsuma/src',
+    'thirdparty/libsatsuma/external/lemon',
+    'thirdparty/libsatsuma/external/timekeeper/src',
+    '#modules/bimdf'
+])
+
+module_env.add_source_files(module_env.modules_sources, sources)

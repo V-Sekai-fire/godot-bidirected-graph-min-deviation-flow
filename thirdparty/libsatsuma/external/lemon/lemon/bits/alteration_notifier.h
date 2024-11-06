@@ -25,6 +25,8 @@
 #include <lemon/core.h>
 #include <lemon/bits/lock.h>
 
+#include "bimdf_common.h"
+
 //\ingroup graphbits
 //\file
 //\brief Observer notifier for graph alteration observers.
@@ -354,18 +356,18 @@ namespace lemon {
     //
     // It notifies all the registed observers about an item added to
     // the container.
-    void add(const Item& item) {
+    BIMDF_WRAPPED(void) add(const Item& item) {
       typename Observers::reverse_iterator it;
-      try {
+      BIMDF_TRY {
         for (it = _observers.rbegin(); it != _observers.rend(); ++it) {
           (*it)->add(item);
         }
-      } catch (...) {
+      } BIMDF_CATCH (...) {
         typename Observers::iterator jt;
         for (jt = it.base(); jt != _observers.end(); ++jt) {
           (*jt)->erase(item);
         }
-        throw;
+        BIMDF_RETHROW;
       }
     }
 
@@ -374,18 +376,18 @@ namespace lemon {
     //
     // It notifies all the registed observers about more item added to
     // the container.
-    void add(const std::vector<Item>& items) {
+    BIMDF_WRAPPED(void) add(const std::vector<Item>& items) {
       typename Observers::reverse_iterator it;
-      try {
+      BIMDF_TRY {
         for (it = _observers.rbegin(); it != _observers.rend(); ++it) {
           (*it)->add(items);
         }
-      } catch (...) {
+      } BIMDF_CATCH (...) {
         typename Observers::iterator jt;
         for (jt = it.base(); jt != _observers.end(); ++jt) {
           (*jt)->erase(items);
         }
-        throw;
+        BIMDF_RETHROW;
       }
     }
 
@@ -394,13 +396,13 @@ namespace lemon {
     //
     // It notifies all the registed observers about an item erased from
     // the container.
-    void erase(const Item& item) throw() {
+    BIMDF_WRAPPED(void) erase(const Item& item) BIMDF_THROW_SPECIFIER {
       typename Observers::iterator it = _observers.begin();
       while (it != _observers.end()) {
-        try {
+        BIMDF_TRY {
           (*it)->erase(item);
           ++it;
-        } catch (const ImmediateDetach&) {
+        } BIMDF_CATCH (const ImmediateDetach&) {
           (*it)->_index = _observers.end();
           (*it)->_notifier = 0;
           it = _observers.erase(it);
@@ -413,13 +415,13 @@ namespace lemon {
     //
     // It notifies all the registed observers about more item erased from
     // the container.
-    void erase(const std::vector<Item>& items) {
+    BIMDF_WRAPPED(void) erase(const std::vector<Item>& items) {
       typename Observers::iterator it = _observers.begin();
       while (it != _observers.end()) {
-        try {
+        BIMDF_TRY {
           (*it)->erase(items);
           ++it;
-        } catch (const ImmediateDetach&) {
+        } BIMDF_CATCH (const ImmediateDetach&) {
           (*it)->_index = _observers.end();
           (*it)->_notifier = 0;
           it = _observers.erase(it);
@@ -432,18 +434,18 @@ namespace lemon {
     //
     // Notifies all the registed observers about the container is built
     // from an empty container.
-    void build() {
+    BIMDF_WRAPPED(void) build() {
       typename Observers::reverse_iterator it;
-      try {
+      BIMDF_TRY {
         for (it = _observers.rbegin(); it != _observers.rend(); ++it) {
           (*it)->build();
         }
-      } catch (...) {
+      } BIMDF_CATCH (...) {
         typename Observers::iterator jt;
         for (jt = it.base(); jt != _observers.end(); ++jt) {
           (*jt)->clear();
         }
-        throw;
+        BIMDF_RETHROW;
       }
     }
 
@@ -452,13 +454,13 @@ namespace lemon {
     //
     // Notifies all the registed observers about all items are erased
     // from the container.
-    void clear() {
+    BIMDF_WRAPPED(void) clear() {
       typename Observers::iterator it = _observers.begin();
       while (it != _observers.end()) {
-        try {
+        BIMDF_TRY {
           (*it)->clear();
           ++it;
-        } catch (const ImmediateDetach&) {
+        } BIMDF_CATCH (const ImmediateDetach&) {
           (*it)->_index = _observers.end();
           (*it)->_notifier = 0;
           it = _observers.erase(it);

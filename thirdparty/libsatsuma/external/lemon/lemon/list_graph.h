@@ -24,7 +24,6 @@
 ///\brief ListDigraph and ListGraph classes.
 
 #include <lemon/core.h>
-#include <lemon/error.h>
 #include <lemon/bits/graph_extender.h>
 
 #include <vector>
@@ -678,30 +677,32 @@ namespace lemon {
       void addNode(const Node& node) {
         added_nodes.push_front(node);
       }
-      void eraseNode(const Node& node) {
+      BIMDF_WRAPPED(void) eraseNode(const Node& node) {
         std::list<Node>::iterator it =
           std::find(added_nodes.begin(), added_nodes.end(), node);
         if (it == added_nodes.end()) {
           clear();
           arc_observer_proxy.detach();
-          throw NodeNotifier::ImmediateDetach();
+          return ExceptionCast("Immediate detach occurred due to missing arc"); 
         } else {
           added_nodes.erase(it);
+          return BIMDF_VOID;
         }
       }
 
       void addArc(const Arc& arc) {
         added_arcs.push_front(arc);
       }
-      void eraseArc(const Arc& arc) {
+      BIMDF_WRAPPED(void) eraseArc(const Arc& arc) {
         std::list<Arc>::iterator it =
           std::find(added_arcs.begin(), added_arcs.end(), arc);
         if (it == added_arcs.end()) {
           clear();
           node_observer_proxy.detach();
-          throw ArcNotifier::ImmediateDetach();
+          return ExceptionCast("Immediate detach occurred due to missing arc"); 
         } else {
           added_arcs.erase(it);
+          return BIMDF_VOID;
         }
       }
 
@@ -1496,7 +1497,7 @@ namespace lemon {
         if (it == added_nodes.end()) {
           clear();
           edge_observer_proxy.detach();
-          throw NodeNotifier::ImmediateDetach();
+          BIMDF_RUNTIME_ERROR("Immediate detach occurred due to missing node");
         } else {
           added_nodes.erase(it);
         }
@@ -1511,7 +1512,7 @@ namespace lemon {
         if (it == added_edges.end()) {
           clear();
           node_observer_proxy.detach();
-          throw EdgeNotifier::ImmediateDetach();
+          BIMDF_RUNTIME_ERROR("Immediate detach occurred due to missing edge");
         } else {
           added_edges.erase(it);
         }
@@ -2403,7 +2404,7 @@ namespace lemon {
         if (it == added_nodes.end()) {
           clear();
           edge_observer_proxy.detach();
-          throw NodeNotifier::ImmediateDetach();
+          BIMDF_RUNTIME_ERROR("Immediate detach occurred due to missing node");
         } else {
           added_nodes.erase(it);
         }
@@ -2418,7 +2419,7 @@ namespace lemon {
         if (it == added_edges.end()) {
           clear();
           node_observer_proxy.detach();
-          throw EdgeNotifier::ImmediateDetach();
+          BIMDF_RUNTIME_ERROR("Immediate detach occurred due to missing edge");
         } else {
           added_edges.erase(it);
         }
