@@ -21,7 +21,6 @@ third_party_sources += [
 ]
 
 module_env = env.Clone()
-
 module_env.Prepend(CPPPATH=[
     'thirdparty/libsatsuma/src',
     'thirdparty/libsatsuma/external/lemon',
