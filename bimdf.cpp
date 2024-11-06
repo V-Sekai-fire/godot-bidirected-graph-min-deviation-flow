@@ -61,8 +61,8 @@ void BIMDF::solve() {
 	edges["b_c"] = bimdf.add_edge({ .u = b, .v = c, .u_head = true, .v_head = true, .cost_function = Abs{ .target = .2, .weight = 1 }, .lower = 0 });
 
 	auto config = Satsuma::BiMDFSolverConfig{
-		.matching_solver = Satsuma::MatchingSolver::Lemon,
 		.double_cover = Satsuma::BiMDFDoubleCoverConfig(),
+		.matching_solver = Satsuma::MatchingSolver::Lemon,
 	};
 	auto result = Satsuma::solve_bimdf(bimdf, config);
 	std::ostringstream buffer;
