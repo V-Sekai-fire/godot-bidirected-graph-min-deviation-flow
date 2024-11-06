@@ -1,0 +1,12 @@
+
+Import('env')
+
+sources = [
+    "register_types.cpp",
+]
+
+module_env = env.Clone()
+module_env.Append(CCFLAGS=['-O2'])
+module_env.Prepend(CPPPATH=['thirdparty/libsatsuma/src', 'thirdparty/external/lemon'])
+
+module_env.add_source_files(env.modules_sources, sources)
