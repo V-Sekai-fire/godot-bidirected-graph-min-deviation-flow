@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  register_types.h                                                      */
+/*  bimdf.h                                                               */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -34,19 +34,21 @@
 #include "core/object/object.h"
 #include "core/object/ref_counted.h"
 
-#include <libsatsuma/Problems/BiMDF.hh>
-#include <libsatsuma/Extra/Highlevel.hh>
 #include <libTimekeeper/StopWatchPrinting.hh>
+#include <libsatsuma/Extra/Highlevel.hh>
+#include <libsatsuma/Problems/BiMDF.hh>
 #include <map>
 
 class BIMDF : public RefCounted {
-    GDCLASS(BIMDF, RefCounted);
+	GDCLASS(BIMDF, RefCounted);
+
 protected:
-    static void _bind_methods() {
-        ClassDB::bind_method(D_METHOD("solve"), &BIMDF::solve);
-    }
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("solve"), &BIMDF::solve);
+	}
+
 public:
 	void solve();
 };
 
-#endif
+#endif // BIMDF_H
