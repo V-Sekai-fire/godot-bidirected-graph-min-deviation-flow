@@ -7,7 +7,6 @@ sources = [
 sources += env.Glob('*.cpp')
 
 module_env = env.Clone()
-module_env["disable_exceptions"] = False
 
 module_env.Prepend(CPPPATH=[
     'thirdparty/libsatsuma/src',

@@ -70,8 +70,7 @@ double get_guess(Function const&f);
 
 /// Sum of other types of cost functions
 struct Sum {
-    template<typename Iterator>
-    Sum(Iterator _begin, Iterator _end) {
+    Sum(auto _begin, auto _end) {
         components_.reserve(std::distance(_begin, _end));
         auto min_guess = std::numeric_limits<double>::infinity();
         auto max_guess = -std::numeric_limits<double>::infinity();
