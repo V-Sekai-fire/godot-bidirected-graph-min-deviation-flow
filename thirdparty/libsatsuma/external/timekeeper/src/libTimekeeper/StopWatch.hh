@@ -160,12 +160,12 @@ std::ostream& operator<<(std::ostream& os, const HierarchicalStopWatch &sw);
 class ScopedStopWatch
 {
 public:
-    [[nodiscard]] ScopedStopWatch(StopWatch &watch)
+    ScopedStopWatch(StopWatch &watch)
         : watch_(watch)
     {
         maybe_start();
     }
-    [[nodiscard]] ScopedStopWatch(HierarchicalStopWatch &hsw)
+    ScopedStopWatch(HierarchicalStopWatch &hsw)
         : ScopedStopWatch(hsw.watch())
     {}
 
