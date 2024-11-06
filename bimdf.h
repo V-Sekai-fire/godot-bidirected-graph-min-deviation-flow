@@ -34,11 +34,6 @@
 #include "core/object/object.h"
 #include "core/object/ref_counted.h"
 
-#include <libTimekeeper/StopWatchPrinting.hh>
-#include <libsatsuma/Extra/Highlevel.hh>
-#include <libsatsuma/Problems/BiMDF.hh>
-#include <map>
-
 class BIMDF : public RefCounted {
 	GDCLASS(BIMDF, RefCounted);
 

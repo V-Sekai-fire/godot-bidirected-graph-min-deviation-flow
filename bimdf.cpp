@@ -29,7 +29,11 @@
 /**************************************************************************/
 
 #include "bimdf.h"
-#include "core/string/ustring.h"
+
+#include <libTimekeeper/StopWatchPrinting.hh>
+#include <libsatsuma/Extra/Highlevel.hh>
+#include <libsatsuma/Problems/BiMDF.hh>
+#include <map>
 
 void BIMDF::solve() {
 	using BiMDF = Satsuma::BiMDF;
@@ -62,6 +66,7 @@ void BIMDF::solve() {
 	};
 	auto result = Satsuma::solve_bimdf(bimdf, config);
 	std::ostringstream buffer;
+
 	buffer << "Total cost: " << result.cost << "\n";
 	for (const auto &[name, edge] : edges) {
 		buffer << "Flow on " << name << ": " << (*result.solution)[edge] << "\n";
