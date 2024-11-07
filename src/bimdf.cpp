@@ -30,10 +30,14 @@
 
 #include "bimdf.h"
 
+#include <godot_cpp/variant/utility_functions.hpp>
+
 #include <libTimekeeper/StopWatchPrinting.hh>
 #include <libsatsuma/Extra/Highlevel.hh>
 #include <libsatsuma/Problems/BiMDF.hh>
 #include <map>
+
+using namespace godot;
 
 void BIMDF::solve() {
 	using BiMDF = Satsuma::BiMDF;
@@ -61,8 +65,8 @@ void BIMDF::solve() {
 	edges["b_c"] = bimdf.add_edge({ .u = b, .v = c, .u_head = true, .v_head = true, .cost_function = Abs{ .target = .2, .weight = 1 }, .lower = 0 });
 
 	auto config = Satsuma::BiMDFSolverConfig{
-		.matching_solver = Satsuma::MatchingSolver::Lemon,
 		.double_cover = Satsuma::BiMDFDoubleCoverConfig(),
+		.matching_solver = Satsuma::MatchingSolver::Lemon,
 	};
 	auto result = Satsuma::solve_bimdf(bimdf, config);
 	std::ostringstream buffer;
@@ -73,5 +77,9 @@ void BIMDF::solve() {
 	}
 	buffer << result.stopwatch << std::endl;
 	std::string output = buffer.str();
-	print_line(output.c_str());
+	UtilityFunctions::print(output.c_str());
+}
+
+void BIMDF::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("solve"), &BIMDF::solve);
 }
