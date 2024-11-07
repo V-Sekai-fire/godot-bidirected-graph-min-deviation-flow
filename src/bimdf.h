@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  register_types.h                                                      */
+/*  bimdf.h                                                               */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,12 +28,21 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef BIMDF_REGISTER_TYPES_H
-#define BIMDF_REGISTER_TYPES_H
+#ifndef BIMDF_H
+#define BIMDF_H
 
-#include "modules/register_module_types.h"
+#include <godot_cpp/classes/ref_counted.hpp>
 
-void initialize_bimdf_module(ModuleInitializationLevel p_level);
-void uninitialize_bimdf_module(ModuleInitializationLevel p_level);
+using namespace godot;
 
-#endif // BIMDF_REGISTER_TYPES_H
+class BIMDF : public RefCounted {
+	GDCLASS(BIMDF, RefCounted);
+
+protected:
+	static void _bind_methods();
+
+public:
+	void solve();
+};
+
+#endif // BIMDF_H
