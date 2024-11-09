@@ -3,7 +3,6 @@
 #pragma once
 
 #include <libsatsuma/Problems/BiMDF.hh>
-#include <span>
 
 namespace Satsuma {
 
@@ -20,7 +19,12 @@ public:
     template<typename T> using EdgeMap = BiMDF::EdgeMap<T>;
 
     BiMDF_ConnectedComponents(BiMDF const &_orig);
-    std::span<BiMDF> bimdfs() const {return {bimdfs_.get(), bimdfs_.get()+n_cc_};}
+    std::pair<BiMDF*, BiMDF*> bimdfs() const {
+        return {bimdfs_.get(), bimdfs_.get() + n_cc_};
+    }
+    size_t num_components() const {
+        return n_cc_;
+    }
     BiMDFResult translate_solutions(std::vector<BiMDFResult> const&_sols) const;
 private:
     BiMDF const &orig_;

@@ -15,6 +15,8 @@
 
 #include "lemon/maps.h"
 
+#include <string>
+
 #if SATSUMA_HAVE_GUROBI
 #  include <libsatsuma/Solvers/BiMCFGurobi.hh> // just for testing
 #endif
@@ -120,8 +122,7 @@ BiMDFMatchingResult solve_bimdf_matching(const BiMDF &bimdf, const BiMDFSolverCo
             .stopwatch = sw_result};
 }
 
-BiMDFFullResult solve_bimdf(const BiMDF &_bimdf, const BiMDFSolverConfig &_config)
-{
+BiMDFFullResult solve_bimdf(const BiMDF &_bimdf, const BiMDFSolverConfig &_config) {
     Timekeeper::HierarchicalStopWatch sw("solve_bimdf");
     Timekeeper::HierarchicalStopWatch sw_cc("cc", sw);
     Timekeeper::HierarchicalStopWatch sw_simp("simplification", sw);
@@ -130,7 +131,7 @@ BiMDFFullResult solve_bimdf(const BiMDF &_bimdf, const BiMDFSolverConfig &_confi
     sw_cc.resume();
     Satsuma::BiMDF_ConnectedComponents cc(_bimdf);
     sw_cc.stop();
-    size_t n_cc = cc.bimdfs().size();
+    size_t n_cc = cc.num_components();
 
     std::vector<BiMDFResult> sols;
     std::vector<Timekeeper::HierarchicalStopWatchResult> sw_results;
@@ -140,59 +141,57 @@ BiMDFFullResult solve_bimdf(const BiMDF &_bimdf, const BiMDFSolverConfig &_confi
     sw_results.reserve(n_cc);
     cc_info.reserve(n_cc);
 
-    // TODO: parallel solve? are both matching solvers sufficiently thread-safe? is it worth the overhead?
-    for (const auto &sub_bimdf: cc.bimdfs()) {
-        sw_simp.resume();
-#if 1
+    // Iterate over each connected component
+	for (BiMDF *it = cc.bimdfs().first; it != cc.bimdfs().second; ++it) {
+		const BiMDF &sub_bimdf = *it;
+		sw_simp.resume();
+
+        // Simplify and solve the matching problem for each sub-BiMDF
         Satsuma::BiMDF_Simplification simp(sub_bimdf);
         sw_simp.stop();
         auto simp_sol = Satsuma::solve_bimdf_matching(simp.bimdf(), _config);
         sw_results.push_back(std::move(simp_sol.stopwatch));
         cc_info.push_back({
-                              .n_nodes = sub_bimdf.n_nodes(),
-                              .n_edges = sub_bimdf.n_edges(),
-                              .double_cover = std::move(simp_sol.double_cover_info),
-                              .matching = std::move(simp_sol.info)});
+            .n_nodes = sub_bimdf.n_nodes(),
+            .n_edges = sub_bimdf.n_edges(),
+            .double_cover = std::move(simp_sol.double_cover_info),
+            .matching = std::move(simp_sol.info)
+        });
+
         if (_config.verbosity >= 3) {
-            std::cout << "\tsimp. sub-BiMDF, cost = " << simp.bimdf().cost(*simp_sol.result.solution) << std::endl;
+            std::cout << "\tSimplified sub-BiMDF, cost = " << simp.bimdf().cost(*simp_sol.result.solution) << std::endl;
         }
+
         sw_simp.resume();
-        auto bimdf_result = simp.translate_solution(simp_sol.result);
-        sw_simp.stop();
-#else
-        auto bimdf_result = Satsuma::solve_bimdf_matching(sub_bimdf).result;
-#endif
+		BiMDFResult bimdf_result = simp.translate_solution(simp_sol.result);
+		sw_simp.stop();
 
-        //auto bimdf_sol = Satsuma::solve_bimdf_matching(sub_bimdf, 2, 2, Satsuma::MatchingSolver::BlossomV, 5);
-        //std::cout << "full solved sub- BiMDF, cost = " << sub_bimdf.cost(*bimdf_sol.solution) << std::endl;
         sols.push_back(std::move(bimdf_result));
-        // TODO: collect information from sub-solves
-    }
+	}
 
-    sw_cc.resume();
-    auto bimdf_sol = cc.translate_solutions(sols);
-    sw_cc.stop();
+	sw_cc.resume();
+	BiMDFResult bimdf_sol = cc.translate_solutions(sols);
+	sw_cc.stop();
 
     if (_config.verbosity >= 1) {
-        std::cout << "Solved BiMDF, cost = " << _bimdf.cost(*bimdf_sol.solution) << std::endl;
+        std::cout << "Solved BiMDF, total cost = " << _bimdf.cost(*bimdf_sol.solution) << std::endl;
     }
-
 
     sw.stop();
-    auto sw_result = Timekeeper::HierarchicalStopWatchResult(sw);
-    size_t sub_id = 0;
-    for (auto &sub_sw: sw_results) {
-        // avoid spurious(?) -Wrestrict warning that occurs with `+=` by using tmp:
-        auto tmp = sub_sw.name + std::string(" ") + std::to_string(sub_id++);
-        sub_sw.name = tmp;
+	Timekeeper::HierarchicalStopWatchResult sw_result = Timekeeper::HierarchicalStopWatchResult(sw);
+	size_t sub_id = 0;
+	for (Timekeeper::HierarchicalStopWatchResult &sub_sw : sw_results) {
+		auto tmp = sub_sw.name + " " + std::to_string(sub_id++);
+		sub_sw.name = tmp;
         sw_result.add_child(sub_sw);
-    }
+	}
 
-    return {.solution = std::move(bimdf_sol.solution),
-                .cost = bimdf_sol.cost,
-                .cc_info = cc_info,
-                .stopwatch = sw_result};
-
+	return {
+        .solution = std::move(bimdf_sol.solution),
+        .cost = bimdf_sol.cost,
+        .cc_info = cc_info,
+        .stopwatch = sw_result
+    };
 }
 
 } // namespace Satsuma
